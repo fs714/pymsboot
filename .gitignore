@@ -102,3 +102,19 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# PyBuilder
+target/
+
+# Pycharm
+.idea
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# VIM
+*.swp
+
+# Generated files
+AUTHORS
+ChangeLog
