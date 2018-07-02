@@ -1,6 +1,19 @@
 Python Micro Service Example Project
 
-### 1. Restful API Server
+### 1. Generate conf file
+```
+oslo-config-generator \
+--namespace pymsboot.config \
+--namespace oslo.config \
+--namespace oslo.log \
+--namespace oslo.concurrency \
+--namespace oslo.service.service \
+--namespace oslo.service.periodic_task \
+--namespace oslo.service.sslutils \
+--namespace oslo.service.wsgi
+```
+
+### 2. Restful API Server
 
 URL | Method | Usage
 --- | --- | ---
@@ -10,4 +23,4 @@ URL | Method | Usage
 /v1/movies/<UUID> | PUT | Update one movie information by UUID
 /v1/movies/<UUID> | DELETE | Delete one movie information by UUID
 
-### 2. RPC Service
+### 3. RPC Service
