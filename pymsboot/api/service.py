@@ -17,13 +17,8 @@ class WSGIService(service.ServiceBase):
         self.app = app.setup_app()
 
         self.workers = CONF.api.api_workers
-        if self.workers is not None and self.workers < 1:
-            LOG.warning(
-                "Value of config option api_workers must be integer "
-                "greater than 1.  Input value ignored."
-            )
-            self.workers = None
-        self.workers = self.workers or processutils.get_worker_count()
+        if self.workers is None or self.workers < 1:
+            self.workers = processutils.get_worker_count()
 
         self.server = wsgi.Server(
             cfg.CONF,

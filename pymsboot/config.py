@@ -22,10 +22,9 @@ api_opts = [
     cfg.PortOpt('port', default=9666, help='Pymsboot API server port.'),
     cfg.IntOpt(
         'api_workers',
-        default=1,
+        default=0,
         help='Number of workers for Pymsboot API service '
-             'default is equal to the number of CPUs available if that can '
-             'be determined, else a default worker count of 1 is returned.'
+             'default 0 means number of CPUs available'
     ),
     cfg.BoolOpt(
         'enable_periodic_task_01',
@@ -79,15 +78,11 @@ engine_opts = [
         help='The message topic that the engine listens on.'
     ),
     cfg.IntOpt(
-        'function_service_expiration',
-        default=3600,
-        help='Maximum service time in seconds for function in orchestrator.'
-    ),
-    cfg.IntOpt(
-        'function_concurrency',
-        default=3,
-        help='Maximum number of concurrent executions per function.'
-    ),
+        'engine_workers',
+        default=0,
+        help='Number of workers for Pymsboot engine service '
+             'default 0 means number of CPUs available'
+    )
 ]
 
 
