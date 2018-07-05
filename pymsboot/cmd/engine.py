@@ -6,9 +6,9 @@ from oslo_config import cfg
 from oslo_log import log as logging
 
 from pymsboot import config
-from pymsboot import rpc
 from pymsboot.engine import service as engine_service
 
+LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
 
@@ -20,12 +20,12 @@ def main():
             argv = sys.argv[1:]
         config.parse_args(args=argv)
         logging.setup(CONF, 'pymsboot')
+        LOG.info('Start Engine Server')
 
         workers = CONF.engine.engine_workers
         if workers is None or workers < 1:
             workers = processutils.get_worker_count()
 
-        rpc.get_transport()
         sm = cotyledon.ServiceManager()
         sm.add(
             engine_service.EngineService,

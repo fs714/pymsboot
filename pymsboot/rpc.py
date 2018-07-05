@@ -2,7 +2,6 @@ import oslo_messaging as messaging
 from oslo_config import cfg
 
 _TRANSPORT = None
-_ENGINE_CLIENT = None
 
 
 def get_transport():

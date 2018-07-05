@@ -11,6 +11,7 @@ from oslo_service import service
 from pymsboot.api import service as api_service
 from pymsboot import config
 
+LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
 
@@ -22,6 +23,8 @@ def main():
             argv = sys.argv[1:]
         config.parse_args(args=argv)
         logging.setup(CONF, 'pymsboot')
+        LOG.info('Start API Server')
+
         api_server = api_service.WSGIService()
         launcher = service.launch(CONF, api_server, workers=api_server.workers)
         launcher.wait()
