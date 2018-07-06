@@ -10,7 +10,8 @@ oslo-config-generator \
 --namespace oslo.service.service \
 --namespace oslo.service.periodic_task \
 --namespace oslo.service.sslutils \
---namespace oslo.service.wsgi
+--namespace oslo.service.wsgi \
+--namespace oslo.messaging
 ```
 
 ### 2. Restful API Server
