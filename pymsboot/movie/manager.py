@@ -19,18 +19,22 @@ class MovieManager(Manager):
     def init_host(self):
         LOG.info('Invoke init_host')
 
-    def add_movie(self, movie):
-        LOG.info('Add movie {}'.format(movie))
-        self.movie_handler.add(movie)
+    def add_movie(self, movie_dict):
+        LOG.info('Add movie {}'.format(movie_dict['id']))
+        self.movie_handler.add(movie_dict)
 
-    def delete_movie(self, movie):
-        LOG.info('Delete movie {}'.format(movie))
-        self.movie_handler.delete(movie)
+    def delete_movie(self, movie_id):
+        LOG.info('Delete movie {}'.format(movie_id))
+        self.movie_handler.delete(movie_id)
 
-    def update_movie(self, movie):
-        LOG.info('Update movie {}'.format(movie))
-        self.movie_handler.update(movie)
+    def update_movie(self, movie_id, url):
+        LOG.info('Update movie {} from {}'.format(movie_id, url))
+        self.movie_handler.update(movie_id, url)
 
-    def get_movie(self, movie):
-        LOG.info('Get movie {}'.format(movie))
-        return self.movie_handler.get(movie)
+    def get_movie(self, movie_id):
+        LOG.info('Get movie {}'.format(movie_id))
+        return self.movie_handler.get(movie_id)
+
+    def get_all_movies(self):
+        LOG.info('Get all movies')
+        return self.movie_handler.get_all()
