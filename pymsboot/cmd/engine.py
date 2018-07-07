@@ -1,9 +1,12 @@
+import eventlet
+
+eventlet.monkey_patch()
+
 import sys
 
-import cotyledon
-from oslo_concurrency import processutils
 from oslo_config import cfg
 from oslo_log import log as logging
+from oslo_service import service
 
 from pymsboot import config
 from pymsboot.db.api import db_setup
@@ -25,16 +28,9 @@ def main():
 
         db_setup()
 
-        workers = CONF.engine.engine_workers
-        if workers is None or workers < 1:
-            workers = processutils.get_worker_count()
-
-        sm = cotyledon.ServiceManager()
-        sm.add(
-            engine_service.EngineService,
-            workers=workers
-        )
-        sm.run()
+        engine_server = engine_service.RPCService()
+        launcher = service.launch(CONF, engine_server, workers=engine_server.workers)
+        launcher.wait()
     except RuntimeError as excp:
         sys.stderr.write("ERROR: %s\n" % excp)
         sys.exit(1)

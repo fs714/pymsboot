@@ -29,12 +29,12 @@ api_opts = [
     ),
     cfg.BoolOpt(
         'enable_periodic_task_01',
-        default=True,
+        default=False,
         help='Enable periodic task 01.'
     ),
     cfg.BoolOpt(
         'enable_periodic_task_02',
-        default=True,
+        default=False,
         help='Enable periodic task 02.'
     ),
 ]
@@ -83,7 +83,17 @@ engine_opts = [
         default=0,
         help='Number of workers for Pymsboot engine service '
              'default 0 means number of CPUs available'
-    )
+    ),
+    cfg.BoolOpt(
+        'enable_periodic_task_01',
+        default=False,
+        help='Enable periodic task 01.'
+    ),
+    cfg.BoolOpt(
+        'enable_periodic_task_02',
+        default=False,
+        help='Enable periodic task 02.'
+    ),
 ]
 
 

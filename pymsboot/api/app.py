@@ -5,11 +5,12 @@ from oslo_log import log as logging
 from pymsboot.services import periodics
 
 LOG = logging.getLogger(__name__)
+CONF = cfg.CONF
 
 
 def get_pecan_config():
     # Set up the pecan configuration.
-    opts = cfg.CONF.pecan
+    opts = CONF.pecan
 
     cfg_dict = {
         "app": {
@@ -30,10 +31,10 @@ def setup_app(config=None):
 
     # Initial setup include databse, periodic tasks, etc
     LOG.info('Starting periodic tasks...')
-    if cfg.CONF.api.enable_periodic_task_01:
+    if CONF.api.enable_periodic_task_01:
         periodics.start_periodic_task_01_handler()
 
-    if cfg.CONF.api.enable_periodic_task_02:
+    if CONF.api.enable_periodic_task_02:
         periodics.start_periodic_task_02_handler()
 
     app = pecan.make_app(
