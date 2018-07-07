@@ -1,6 +1,7 @@
 import pecan
 from oslo_log import log as logging
 from pecan import rest
+from wsme import Unset
 from wsme import types as wtypes
 
 from pymsboot.api import expose
@@ -48,7 +49,9 @@ class MoviesController(rest.RestController):
     @expose.expose(wtypes.text, body=Movie, status_code=201)
     def post(self, movie):
         LOG.info('Adding a new movie')
-        get_movie_rpc_client().add(ctxt={}, movie_dict=movie.to_dict)
+        if movie.state == Unset:
+            movie.state = None
+        get_movie_rpc_client().add(ctxt={}, movie_dict=movie.to_dict())
         return 'Download In Progress'
 
     @pecan.expose()
@@ -66,8 +69,11 @@ class MovieController(rest.RestController):
         Invode database api directly
         """
         LOG.info('Getting movie {}.'.format(self.movie_id))
-        movie = get_connection().get_movie_by_id(self.movie_id).to_dict()
-        return Movie(**movie)
+        movie = get_connection().get_movie_by_id(self.movie_id)
+        if movie:
+            return Movie(**movie.to_dict())
+        else:
+            return None
 
     @expose.expose(wtypes.text, body=Movie)
     def put(self, movie):
