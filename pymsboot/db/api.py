@@ -1,3 +1,5 @@
+from oslo_config import cfg
+from oslo_log import log as logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import exc
 from sqlalchemy.orm import sessionmaker
@@ -15,7 +17,7 @@ EXIST_MOVIES_DB = [
     {
         'id': 'c840f0b6-0d28-4c0c-abaa-f96dca76c057',
         'name': 'Your Name',
-        'rank': 1,
+        'rank': 2,
         'url': 'http://www.baidu.com',
         'state': 'Downloading',
     }
@@ -25,14 +27,27 @@ _ENGINE = None
 _SESSION_MAKER = None
 _CONNECTION = None
 
+LOG = logging.getLogger(__name__)
+CONF = cfg.CONF
+
+
+def db_setup():
+    LOG.info('Setup DB')
+    _ENGINE = create_engine(CONF.db_engine)
+    db_models.Base.metadata.create_all(_ENGINE)
+
+    LOG.info('Init DB Data')
+    for m in EXIST_MOVIES_DB:
+        get_connection().add_movie(db_models.Movie(**m))
+
 
 def get_engine():
     global _ENGINE
     if _ENGINE is not None:
         return _ENGINE
 
-    _ENGINE = create_engine('sqlite://')
-    db_models.Base.metadata.create_all(_ENGINE)
+    LOG.info('Init DB Engine')
+    _ENGINE = create_engine(CONF.db_engine)
     return _ENGINE
 
 
@@ -41,6 +56,7 @@ def get_session_maker(engine):
     if _SESSION_MAKER is not None:
         return _SESSION_MAKER
 
+    LOG.info('Init DB Session Maker')
     _SESSION_MAKER = sessionmaker(bind=engine)
     return _SESSION_MAKER
 
@@ -58,9 +74,8 @@ def get_connection():
     if _CONNECTION is not None:
         return _CONNECTION
 
+    LOG.info('Init DB API')
     _CONNECTION = Connection()
-    for m in EXIST_MOVIES_DB:
-        _CONNECTION.add_movie(db_models.Movie(**m))
     return _CONNECTION
 
 

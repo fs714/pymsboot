@@ -14,6 +14,11 @@ oslo-config-generator \
 --namespace oslo.messaging
 ```
 
+Update
+```
+transport_url = rabbit://guest:guest@127.0.0.1:5672//
+```
+
 ### 2. Restful API Server
 
 URL | Method | Usage

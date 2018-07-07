@@ -6,6 +6,7 @@ from pymsboot import version
 CONF = cfg.CONF
 
 default_opts = [
+    cfg.StrOpt('db_engine', default='sqlite:////tmp/pymsboot.db', help='DB Engine'),
     cfg.StrOpt('conf_test_01', default='conf_test_01_default', help='Pymsboot test 01 config.'),
     cfg.StrOpt('conf_test_02', default='conf_test_02_default', help='Pymsboot test 02 config.'),
 ]

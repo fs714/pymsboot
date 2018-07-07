@@ -6,6 +6,7 @@ from oslo_config import cfg
 from oslo_log import log as logging
 
 from pymsboot import config
+from pymsboot.db.api import db_setup
 from pymsboot.engine import service as engine_service
 
 LOG = logging.getLogger(__name__)
@@ -21,6 +22,8 @@ def main():
         config.parse_args(args=argv)
         logging.setup(CONF, 'pymsboot')
         LOG.info('Start Engine Server')
+
+        db_setup()
 
         workers = CONF.engine.engine_workers
         if workers is None or workers < 1:
