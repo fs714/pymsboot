@@ -45,7 +45,7 @@ class RPCService(service.Service):
         LOG.info('Starting engine...')
         self.server.start()
 
-    def stop(self, graceful=True):
+    def stop(self, graceful=False):
         periodics.stop()
 
         try:

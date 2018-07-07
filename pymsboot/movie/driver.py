@@ -32,11 +32,11 @@ class MovieHandler():
 
     def update(self, movie_id, url):
         LOG.info('Update movie {}'.format(movie_id))
+        self.db_conn.update_movie_url(movie_id, url)
         self.db_conn.update_movie_state(movie_id, 'Downloading')
         LOG.info('Start download movie {} from {}'.format(movie_id, url))
         time.sleep(25)
         LOG.info('Finished download movie {} from {}'.format(movie_id, url))
-        self.db_conn.update_movie_url(movie_id, url)
         self.db_conn.update_movie_state(movie_id, 'Downloaded')
         LOG.info('Finished to update movie {}'.format(movie_id))
 

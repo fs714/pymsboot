@@ -36,7 +36,7 @@ class MovieClient(object):
 
     def put(self, ctxt, movie_id, url):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(ctxt, 'put_movie', movie_id=movie_id, url=url)
+        cctxt.cast(ctxt, 'update_movie', movie_id=movie_id, url=url)
 
     def get(self, ctxt, movie_id):
         """
