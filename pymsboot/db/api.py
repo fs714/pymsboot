@@ -12,14 +12,14 @@ EXIST_MOVIES_DB = [
         'name': 'Titanic',
         'rank': 1,
         'url': 'http://www.baidu.com',
-        'state': 'Downloading',
+        'state': 'Downloaded',
     },
     {
         'id': 'c840f0b6-0d28-4c0c-abaa-f96dca76c057',
         'name': 'Your Name',
         'rank': 2,
         'url': 'http://www.baidu.com',
-        'state': 'Downloading',
+        'state': 'Downloaded',
     }
 ]
 

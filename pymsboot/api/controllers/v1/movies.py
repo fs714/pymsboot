@@ -67,7 +67,7 @@ class MovieController(rest.RestController):
         """
         LOG.info('Getting movie {}.'.format(self.movie_id))
         movie = get_connection().get_movie_by_id(self.movie_id).to_dict()
-        return movie
+        return Movie(**movie)
 
     @expose.expose(wtypes.text, body=Movie)
     def put(self, movie):
