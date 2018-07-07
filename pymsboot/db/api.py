@@ -34,6 +34,7 @@ CONF = cfg.CONF
 def db_setup():
     LOG.info('Setup DB')
     _ENGINE = create_engine(CONF.db_engine)
+    db_models.Base.metadata.drop_all(_ENGINE)
     db_models.Base.metadata.create_all(_ENGINE)
 
     LOG.info('Init DB Data')
