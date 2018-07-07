@@ -10,7 +10,7 @@ class RootResource(wtypes.Base):
 
     It references all other resources belonging to the API.
     """
-    uri = wtypes.text
+    url = wtypes.text
 
 
 class Controller(object):
@@ -19,4 +19,4 @@ class Controller(object):
 
     @expose.expose(RootResource)
     def index(self):
-        return RootResource(uri='%s/%s' % (pecan.request.host_url, 'v1'))
+        return RootResource(url='%s/%s' % (pecan.request.host_url, 'v1'))
