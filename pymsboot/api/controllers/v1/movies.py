@@ -4,6 +4,7 @@ from pecan import rest
 from wsme import types as wtypes
 
 from pymsboot.api import expose
+from pymsboot.db.api import get_connection
 from pymsboot.movie.rpcapi import get_movie_rpc_client
 
 LOG = logging.getLogger(__name__)
@@ -61,8 +62,11 @@ class MovieController(rest.RestController):
 
     @expose.expose(Movie)
     def get(self):
+        """
+        Invode database api directly
+        """
         LOG.info('Getting movie {}.'.format(self.movie_id))
-        movie = get_movie_rpc_client().get(ctxt={}, movie_id=self.movie_id)
+        movie = get_connection().get_movie_by_id(self.movie_id).to_dict()
         return movie
 
     @expose.expose(wtypes.text, body=Movie)
