@@ -4,7 +4,7 @@ from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import service
 
-from pymsboot import rpc
+from pymsboot.rpc import rpc
 from pymsboot.movie.manager import MovieManager
 from pymsboot.services import periodics
 
@@ -12,9 +12,9 @@ LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
 
-class RPCService(service.Service):
+class EngineService(service.Service):
     def __init__(self):
-        super(RPCService, self).__init__()
+        super(EngineService, self).__init__()
         self.topic = CONF.engine.topic
         self.server = CONF.engine.host
 
@@ -31,7 +31,7 @@ class RPCService(service.Service):
             periodics.start_periodic_task_02_handler()
 
     def start(self):
-        super(RPCService, self).start()
+        super(EngineService, self).start()
         transport = rpc.get_transport()
         target = messaging.Target(topic=self.topic, server=self.server)
         endpoint = [MovieManager()]
@@ -51,4 +51,4 @@ class RPCService(service.Service):
         if self.server:
             self.server.stop()
             self.server.wait()
-        super(RPCService, self).stop(graceful)
+        super(EngineService, self).stop(graceful)

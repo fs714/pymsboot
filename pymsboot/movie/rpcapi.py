@@ -2,7 +2,7 @@ import oslo_messaging as messaging
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from pymsboot import rpc
+from pymsboot.rpc import rpc
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)

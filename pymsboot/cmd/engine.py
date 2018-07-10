@@ -10,7 +10,7 @@ from oslo_service import service
 
 from pymsboot import config
 from pymsboot.db.api import db_setup
-from pymsboot.engine import service as engine_service
+from pymsboot.rpc import service as rpc_service
 
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
@@ -28,7 +28,7 @@ def main():
 
         db_setup()
 
-        engine_server = engine_service.RPCService()
+        engine_server = rpc_service.EngineService()
         launcher = service.launch(CONF, engine_server, workers=engine_server.workers)
         launcher.wait()
     except RuntimeError as excp:
