@@ -48,12 +48,7 @@ class RPCService(service.Service):
     def stop(self, graceful=False):
         periodics.stop()
 
-        try:
+        if self.server:
             self.server.stop()
             self.server.wait()
-        except Exception as e:
-            LOG.exception('Service error occurred when stopping the RPC server. Error: %s', e)
-
-        super(RPCService, self).stop(graceful=graceful)
-        LOG.info('Stopped RPC server for service %(service)s on host %(host)s.',
-                 {'service': self.topic, 'host': self.host})
+        super(RPCService, self).stop(graceful)
