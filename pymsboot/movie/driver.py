@@ -43,13 +43,13 @@ class MovieHandler():
     def get(self, movie_id):
         LOG.info('Get movie {}'.format(movie_id))
         time.sleep(1)
-        movie_dict = self.db_conn.get_movie_by_id(movie_id).to_dict()
+        movie_dict = self.db_conn.get_movie_by_id(movie_id).as_dict()
         LOG.info('Finished to get info of movie {}'.format(movie_id))
         return movie_dict
 
     def get_all(self):
         LOG.info('Get all movies')
         time.sleep(3)
-        all_movie_list = [m.to_dict() for m in self.db_conn.get_all_movies()]
+        all_movie_list = [m.as_dict() for m in self.db_conn.get_all_movies()]
         LOG.info('Finished to get all movies')
         return all_movie_list

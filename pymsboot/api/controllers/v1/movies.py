@@ -5,13 +5,14 @@ from wsme import Unset
 from wsme import types as wtypes
 
 from pymsboot.api import expose
+from pymsboot.api.controllers import base
 from pymsboot.db.api import get_connection
 from pymsboot.movie.rpcapi import get_movie_rpc_client
 
 LOG = logging.getLogger(__name__)
 
 
-class Movie(wtypes.Base):
+class Movie(base.APIBase):
     """An Movie."""
 
     id = wtypes.text
@@ -29,15 +30,6 @@ class Movie(wtypes.Base):
     state = wtypes.text
     "The movie state."
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'name': self.name,
-            'rank': self.rank,
-            'url': self.url,
-            'state': self.state,
-        }
-
 
 class MoviesController(rest.RestController):
     @expose.expose([Movie])
@@ -51,7 +43,7 @@ class MoviesController(rest.RestController):
         LOG.info('Adding a new movie')
         if movie.state == Unset:
             movie.state = None
-        get_movie_rpc_client().add(ctxt={}, movie_dict=movie.to_dict())
+        get_movie_rpc_client().add(ctxt={}, movie_dict=movie.as_dict())
         return 'Download In Progress'
 
     @pecan.expose()
@@ -71,7 +63,7 @@ class MovieController(rest.RestController):
         LOG.info('Getting movie {}.'.format(self.movie_id))
         movie = get_connection().get_movie_by_id(self.movie_id)
         if movie:
-            return Movie(**movie.to_dict())
+            return Movie(**movie.as_dict())
         else:
             return None
 

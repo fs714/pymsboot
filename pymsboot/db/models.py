@@ -13,5 +13,5 @@ class Movie(Base):
     url = Column(String(255))
     state = Column(String(64))
 
-    def to_dict(self):
+    def as_dict(self):
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
