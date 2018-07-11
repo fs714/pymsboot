@@ -1,13 +1,13 @@
 import pecan
 from oslo_log import log as logging
+from oslo_utils import uuidutils
 from pecan import rest
 from wsme import Unset
 from wsme import types as wtypes
 
+from pymsboot import objects
 from pymsboot.api import expose
 from pymsboot.api.controllers import base
-from pymsboot.db.api import get_connection
-from pymsboot.movie.rpcapi import get_movie_rpc_client
 
 LOG = logging.getLogger(__name__)
 
@@ -34,16 +34,19 @@ class Movie(base.APIBase):
 class MoviesController(rest.RestController):
     @expose.expose([Movie])
     def get(self):
-        LOG.info('Getting movies.')
-        movies = get_movie_rpc_client().get_all(ctxt={})
-        return [Movie(**m) for m in movies]
+        LOG.info('Get all movies.')
+        movie_objs = objects.Movie.get_all(context=pecan.request.context)
+        return [Movie(**m.as_dict()) for m in movie_objs]
 
     @expose.expose(wtypes.text, body=Movie, status_code=201)
     def post(self, movie):
-        LOG.info('Adding a new movie')
+        LOG.info('Add a movie')
+        if movie.id == Unset:
+            movie.id = uuidutils.generate_uuid()
         if movie.state == Unset:
             movie.state = None
-        get_movie_rpc_client().add(ctxt={}, movie_dict=movie.as_dict())
+        movie_obj = objects.Movie(**movie.as_dict())
+        pecan.request.rpcapi.create_movie(context=pecan.request.context, movie_obj=movie_obj)
         return 'Download In Progress'
 
     @pecan.expose()
@@ -57,24 +60,28 @@ class MovieController(rest.RestController):
 
     @expose.expose(Movie)
     def get(self):
-        """
-        Invode database api directly
-        """
-        LOG.info('Getting movie {}.'.format(self.movie_id))
-        movie = get_connection().get_movie_by_id(self.movie_id)
-        if movie:
-            return Movie(**movie.as_dict())
+        LOG.info('Get movie {}.'.format(self.movie_id))
+        movie_obj = objects.Movie.get_by_id(context=pecan.request.context, id=self.movie_id)
+        if movie_obj:
+            return Movie(**movie_obj.as_dict())
         else:
             return None
 
     @expose.expose(wtypes.text, body=Movie)
     def put(self, movie):
-        LOG.info('Updating movie {}.'.format(self.movie_id))
-        get_movie_rpc_client().put(ctxt={}, movie_id=self.movie_id, url=movie.url)
+        LOG.info('Update movie {}.'.format(self.movie_id))
+        movie_obj = objects.Movie.get_by_id(context=pecan.request.context, id=self.movie_id)
+        # Update only the fields that have changed
+        for field in objects.Movie.fields:
+            if getattr(movie, field) == wtypes.Unset:
+                continue
+            if getattr(movie, field) != movie_obj[field]:
+                movie_obj[field] = getattr(movie, field)
+        pecan.request.rpcapi.update_movie(context=pecan.request.context, movie_obj=movie_obj)
         return 'Update In Progress'
 
     @expose.expose(wtypes.text)
     def delete(self):
         LOG.info('Deleting movie {}.'.format(self.movie_id))
-        get_movie_rpc_client().delete(ctxt={}, movie_id=self.movie_id)
+        pecan.request.rpcapi.delete_movie(context=pecan.request.context, movie_id=self.movie_id)
         return 'Delete In Progress'

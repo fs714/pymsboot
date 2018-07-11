@@ -1,8 +1,15 @@
-from oslo_versionedobjects import base as object_base
-from oslo_versionedobjects import fields as object_fields
+from oslo_versionedobjects import base as ovoo_base
+from oslo_versionedobjects import fields as ovoo_fields
+
+remotable_classmethod = ovoo_base.remotable_classmethod
+remotable = ovoo_base.remotable
 
 
-class PymsbootObject(object_base.VersionedObject):
+class PymsbootObjectRegistry(ovoo_base.VersionedObjectRegistry):
+    pass
+
+
+class PymsbootObject(ovoo_base.VersionedObject):
     """Base class and object factory.
 
     This forms the base of all objects that can be remoted or instantiated
@@ -12,69 +19,46 @@ class PymsbootObject(object_base.VersionedObject):
     as appropriate.
     """
 
+    OBJ_SERIAL_NAMESPACE = 'pymsboot_object'
     OBJ_PROJECT_NAMESPACE = 'pymsboot'
 
+    def as_dict(self):
+        return {k: getattr(self, k)
+                for k in self.fields
+                if self.obj_attr_is_set(k)}
+
+
+class PymsbootObjectDictCompat(ovoo_base.VersionedObjectDictCompat):
+    pass
+
+
+class PymsbootPersistentObject():
+    """Mixin class for Persistent objects.
+
+    This adds the fields that we use in common for all persistent objects.
+    """
     fields = {
-        'created_at': object_fields.DateTimeField(nullable=True),
-        'updated_at': object_fields.DateTimeField(nullable=True),
+        'created_at': ovoo_fields.DateTimeField(nullable=True),
+        'updated_at': ovoo_fields.DateTimeField(nullable=True),
     }
 
-    def as_dict(self):
-        """Return the object represented as a dict.
 
-        The returned object is JSON-serialisable.
-        """
+class PymsbootObjectIndirectionAPI(ovoo_base.VersionedObjectIndirectionAPI):
+    def __init__(self):
+        super(PymsbootObjectIndirectionAPI, self).__init__()
+        from pymsboot.movie import rpcapi as engine_rpcapi
+        self._engineer = engine_rpcapi.MovieClient()
 
-        def _attr_as_dict(field):
-            """Return an attribute as a dict, handling nested objects."""
-            attr = getattr(self, field)
-            if isinstance(attr, PymsbootObject):
-                attr = attr.as_dict()
-            return attr
+    def object_action(self, context, objinst, objmethod, args, kwargs):
+        return self._engineer.object_action(context, objinst, objmethod, args, kwargs)
 
-        return dict((k, _attr_as_dict(k)) for k in self.fields if self.obj_attr_is_set(k))
+    def object_class_action(self, context, objname, objmethod, objver, args, kwargs):
+        return self._engineer.object_class_action(context, objname, objmethod, objver, args, kwargs)
 
-    def _set_from_db_object(self, db_object, fields=None):
-        """Sets object fields.
+    def object_backport(self, context, objinst, target_version):
+        return self._engineer.object_backport(context, objinst, target_version)
 
-        :param db_object: A DB entity of the object
-        :param fields: list of fields to set on obj from db_object.
-        """
-        fields = fields or self.fields
-        for field in fields:
-            setattr(self, field, db_object[field])
 
-    @staticmethod
-    def _from_db_object(obj, db_object, fields=None):
-        """Converts a database entity to a formal object.
-
-        :param obj: An object of the class.
-        :param db_object: A DB entity of the object
-        :param fields: list of fields to set on obj from db_object.
-        :return: The object of the class
-        """
-        obj._set_from_db_object(db_object, fields)
-
-        # NOTE(rloo). We now have obj, a versioned object that corresponds to
-        # its DB representation. A versioned object has an internal attribute
-        # ._changed_fields; this is a list of changed fields -- used, e.g.,
-        # when saving the object to the DB (only those changed fields are
-        # saved to the DB). The obj.obj_reset_changes() clears this list
-        # since we didn't actually make any modifications to the object that
-        # we want saved later.
-        obj.obj_reset_changes()
-
-        return obj
-
-    @classmethod
-    def _from_db_object_list(cls, db_objects):
-        """Returns objects corresponding to database entities.
-
-        Returns a list of formal objects of this class that correspond to
-        the list of database entities.
-
-        :param cls: the VersionedObject class of the desired object
-        :param db_objects: A  list of DB models of the object
-        :returns: A list of objects corresponding to the database entities
-        """
-        return [cls._from_db_object(cls(), db_obj) for db_obj in db_objects]
+class PymsbootObjectSerializer(ovoo_base.VersionedObjectSerializer):
+    # Base class to use for object hydration
+    OBJ_BASE_CLASS = PymsbootObject

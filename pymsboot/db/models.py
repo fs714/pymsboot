@@ -1,7 +1,17 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.ext import declarative
+from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative.declarative_base()
+
+class PymsbootBase():
+
+    def as_dict(self):
+        d = {}
+        for c in self.__table__.columns:
+            d[c.name] = self[c.name]
+        return d
+
+
+Base = declarative_base(cls=PymsbootBase)
 
 
 class Movie(Base):
@@ -12,6 +22,3 @@ class Movie(Base):
     rank = Column(Integer)
     url = Column(String(255))
     state = Column(String(64))
-
-    def as_dict(self):
-        return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}

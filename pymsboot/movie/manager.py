@@ -1,8 +1,9 @@
 import oslo_messaging as messaging
 from oslo_log import log as logging
 
-from pymsboot.rpc.manager import Manager
+from pymsboot import objects
 from pymsboot.movie.driver import MovieHandler
+from pymsboot.rpc.manager import Manager
 
 LOG = logging.getLogger(__name__)
 
@@ -16,25 +17,25 @@ class MovieManager(Manager):
         super(MovieManager, self).__init__()
         self.movie_handler = MovieHandler()
 
-    def init_host(self):
-        LOG.info('Invoke init_host')
+    def create_movie(self, ctx, movie_obj):
+        LOG.info('Add movie {}'.format(movie_obj.id))
+        movie_obj.state = 'Downloading'
+        movie_obj.create(ctx)
+        self.movie_handler.download(movie_obj.id, movie_obj.url)
+        movie_obj.state = 'Downloaded'
+        movie_obj.update(ctx)
 
-    def add_movie(self, ctx, movie_dict):
-        LOG.info('Add movie {}'.format(movie_dict['id']))
-        self.movie_handler.add(movie_dict)
+    def update_movie(self, ctx, movie_obj):
+        LOG.info('Update movie {}'.format(movie_obj.id))
+        movie_obj.state = 'Downloading'
+        movie_obj.update(ctx)
+        self.movie_handler.remove(movie_obj.id)
+        self.movie_handler.download(movie_obj.id, movie_obj.url)
+        movie_obj.state = 'Downloaded'
+        movie_obj.update(ctx)
 
     def delete_movie(self, ctx, movie_id):
         LOG.info('Delete movie {}'.format(movie_id))
-        self.movie_handler.delete(movie_id)
-
-    def update_movie(self, ctx, movie_id, url):
-        LOG.info('Update movie {} from {}'.format(movie_id, url))
-        self.movie_handler.update(movie_id, url)
-
-    def get_movie(self, ctx, movie_id):
-        LOG.info('Get movie {}'.format(movie_id))
-        return self.movie_handler.get(movie_id)
-
-    def get_all_movies(self, ctx):
-        LOG.info('Get all movies')
-        return self.movie_handler.get_all()
+        movie_obj = objects.Movie.get_by_id(ctx, movie_id)
+        self.movie_handler.remove(movie_id)
+        movie_obj.delete(ctx, movie_id)

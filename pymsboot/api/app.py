@@ -2,6 +2,7 @@ import pecan
 from oslo_config import cfg
 from oslo_log import log as logging
 
+from pymsboot.api import hooks
 from pymsboot.services import periodics
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +40,7 @@ def setup_app(config=None):
 
     app = pecan.make_app(
         app_conf.pop('root'),
-        hooks=[],
+        hooks=[hooks.ContextHook(), hooks.RPCHook()],
         logging=getattr(config, 'logging', {}),
         **app_conf
     )

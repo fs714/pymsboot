@@ -25,12 +25,11 @@ data = {
 url = 'http://192.168.56.201:9666/v1/movies'
 print(json.dumps(requests.post(url, json=data).json(), indent=4))
 
-time.sleep(5)
 url = 'http://192.168.56.201:9666/v1/movies/f11edef0-d6e6-4935-ac97-06769cc084a3'
-for i in range(1, 6):
+for i in range(1, 5):
+    time.sleep(5)
     print('------ {}s ------'.format(i * 5))
     print(json.dumps(requests.get(url).json(), indent=4))
-    time.sleep(5)
 
 url = 'http://192.168.56.201:9666/v1/movies'
 print(json.dumps(requests.get(url).json(), indent=4))
@@ -45,12 +44,11 @@ data = {
 url = 'http://192.168.56.201:9666/v1/movies/f11edef0-d6e6-4935-ac97-06769cc084a3'
 print(json.dumps(requests.put(url, json=data).json(), indent=4))
 
-time.sleep(5)
 url = 'http://192.168.56.201:9666/v1/movies/f11edef0-d6e6-4935-ac97-06769cc084a3'
-for i in range(1, 7):
+for i in range(1, 6):
+    time.sleep(5)
     print('------ {}s ------'.format(i * 5))
     print(json.dumps(requests.get(url).json(), indent=4))
-    time.sleep(5)
 
 url = 'http://192.168.56.201:9666/v1/movies'
 print(json.dumps(requests.get(url).json(), indent=4))
@@ -62,6 +60,6 @@ url = 'http://192.168.56.201:9666/v1/movies'
 print(json.dumps(requests.get(url).json(), indent=4))
 
 time.sleep(10)
-print('------ 15s ------')
+print('------ 10s ------')
 url = 'http://192.168.56.201:9666/v1/movies'
 print(json.dumps(requests.get(url).json(), indent=4))

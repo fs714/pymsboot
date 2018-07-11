@@ -2,61 +2,82 @@ from oslo_log import log as logging
 from oslo_versionedobjects import fields as object_fields
 
 from pymsboot.db.api import get_connection
-from pymsboot.objects.base import PymsbootObject
+from pymsboot.objects import base
 
 LOG = logging.getLogger(__name__)
 
 
-class Movie(PymsbootObject):
+@base.PymsbootObjectRegistry.register
+class Movie(base.PymsbootObject, base.PymsbootPersistentObject, base.PymsbootObjectDictCompat):
+    VERSION = '1.0'
     dbapi = get_connection()
 
     fields = {
-        'id': object_fields.UUIDField(nullable=False),
+        'id': object_fields.StringField(nullable=False),
         'name': object_fields.StringField(nullable=True),
         'rank': object_fields.IntegerField(nullable=True),
         'url': object_fields.StringField(nullable=True),
         'state': object_fields.StringField(nullable=True),
     }
 
-    @classmethod
-    def get_by_id(cls, id):
-        """Find a movie based on its uuid and return a movie object."""
+    @staticmethod
+    def _from_db_object(movie_obj, movie_db):
+        """Converts a database entity to a formal object."""
+        for field in movie_obj.fields:
+            try:
+                value = getattr(movie_db, field)
+            except AttributeError:
+                continue
+            except ValueError:
+                value = None
+            movie_obj[field] = value
 
-        LOG.info('Getting movie {}.'.format(id))
-        movie_db = cls.dbapi.get_movie_by_id(id)
-        movie_obj = cls._from_db_object(cls(), movie_db)
+        movie_obj.obj_reset_changes()
         return movie_obj
 
-    @classmethod
-    def get_all(cls):
-        """Find a movie based on its uuid and return a movie object."""
+    @staticmethod
+    def _from_db_object_list(db_objects, cls, context):
+        """Converts a list of database entities to a list of formal objects."""
+        return [Movie._from_db_object(cls(context), obj) for obj in db_objects]
 
+    @base.remotable_classmethod
+    def get_by_id(cls, context, id):
+        """Find a movie based on its uuid and return a movie object."""
+        LOG.info('Getting movie {} {}.'.format(id, context))
+        movie_db = cls.dbapi.get_movie_by_id(id)
+        if movie_db:
+            movie_obj = Movie._from_db_object(cls(context), movie_db)
+            return movie_obj
+        else:
+            return None
+
+    @base.remotable_classmethod
+    def get_all(cls, context):
+        """Find a movie based on its uuid and return a movie object."""
         LOG.info('Getting movies.')
         movies_db = cls.dbapi.get_all_movies()
-        movies_obj = cls._from_db_object_list(movies_db)
+        movies_obj = Movie._from_db_object_list(movies_db, cls, context)
         return movies_obj
 
-    @classmethod
-    def create(cls, movie_dict):
+    @base.remotable
+    def create(self, context):
         """Create a Movie record in the DB."""
-        LOG.info('Create movie from {}.'.format(movie_dict))
-        movie = Movie(**movie_dict)
-        cls.dbapi.add_movie(movie)
+        LOG.info('Create movie {} {}.'.format(self.id, context))
+        values = self.obj_get_changes()
+        db_cluster = self.dbapi.create_movie(values)
+        movie_obj = self._from_db_object(self, db_cluster)
+        return movie_obj
 
-    @classmethod
-    def update_state(cls, id, state):
-        """Update state for a Movie record in the DB."""
-        LOG.info('Update movie {} state to {}'.format(id, state))
-        cls.dbapi.update_movie_state(id, state)
+    @base.remotable
+    def update(self, context):
+        """Update Movie record in the DB."""
+        LOG.info('Update movie {} {}.'.format(self.id, context))
+        updates = self.obj_get_changes()
+        self.dbapi.update_movie(self.id, updates)
+        self.obj_reset_changes()
 
-    @classmethod
-    def update_url(cls, id, url):
-        """Update url for a Movie record in the DB."""
-        LOG.info('Update movie {} url to {}'.format(id, url))
-        cls.dbapi.update_movie_url(id, url)
-
-    @classmethod
-    def delete(cls, id):
+    @base.remotable_classmethod
+    def delete(cls, context, id):
         """Delete a Movie record in the DB."""
-        LOG.info('Delete movie {}'.format(id))
+        LOG.info('Delete movie {} {}'.format(id, context))
         cls.dbapi.delete_movie_by_id(id)

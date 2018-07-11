@@ -24,30 +24,31 @@ class MovieClient(object):
         self.namespace = 'movie'
         self.version = '1.0'
         target = messaging.Target(topic=CONF.engine.topic, namespace=self.namespace, version=self.version)
-        self._client = messaging.RPCClient(rpc.get_transport(), target)
+        serializer = rpc.get_serializer()
+        self._client = messaging.RPCClient(rpc.get_transport(), target, serializer=serializer)
 
-    def add(self, ctxt, movie_dict):
+    def create_movie(self, context, movie_obj):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(ctxt, 'add_movie', movie_dict=movie_dict)
+        cctxt.cast(context, 'create_movie', movie_obj=movie_obj)
 
-    def delete(self, ctxt, movie_id):
+    def update_movie(self, context, movie_obj):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(ctxt, 'delete_movie', movie_id=movie_id)
+        cctxt.cast(context, 'update_movie', movie_obj=movie_obj)
 
-    def put(self, ctxt, movie_id, url):
+    def delete_movie(self, context, movie_id):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(ctxt, 'update_movie', movie_id=movie_id, url=url)
+        cctxt.cast(context, 'delete_movie', movie_id=movie_id)
 
-    def get(self, ctxt, movie_id):
-        """
-        Get operation doesn't need RPC, this is just an example.
-        """
-        cctxt = self._client.prepare(version=self.version, fanout=False)
-        return cctxt.call(ctxt, 'get_movie', movie_id=movie_id)
+    # Versioned Objects indirection API
+    def object_class_action(self, context, objname, objmethod, objver, args, kwargs):
+        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
+        return cctxt.call(context, 'object_class_action', objname=objname, objmethod=objmethod,
+                          objver=objver, args=args, kwargs=kwargs)
 
-    def get_all(self, ctxt):
-        """
-        Get all operation doesn't need RPC, this is just an example.
-        """
-        cctxt = self._client.prepare(version=self.version, fanout=False)
-        return cctxt.call(ctxt, 'get_all_movies')
+    def object_action(self, context, objinst, objmethod, args, kwargs):
+        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
+        return cctxt.call(context, 'object_action', objinst=objinst, objmethod=objmethod, args=args, kwargs=kwargs)
+
+    def object_backport(self, context, objinst, target_version):
+        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
+        return cctxt.call(context, 'object_backport', objinst=objinst, target_version=target_version)

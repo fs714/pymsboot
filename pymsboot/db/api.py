@@ -39,7 +39,7 @@ def db_setup():
 
     LOG.info('Init DB Data')
     for m in EXIST_MOVIES_DB:
-        get_connection().add_movie(db_models.Movie(**m))
+        get_connection().create_movie(m)
 
 
 def get_engine():
@@ -89,34 +89,31 @@ class Connection(object):
         session = get_session()
         query = session.query(db_models.Movie).filter_by(id=id)
         try:
-            movie = query.one()
+            movie_db = query.one()
         except exc.NoResultFound:
             # TODO: process this situation
             return None
-
-        return movie
+        return movie_db
 
     def get_all_movies(self):
         session = get_session()
         query = session.query(db_models.Movie)
-        movies = query.all()
+        movies_db = query.all()
+        return movies_db
 
-        return movies
-
-    def add_movie(self, movie):
+    def create_movie(self, values):
         session = get_session()
-        session.add(movie)
+        movie_db = db_models.Movie(**values)
+        session.add(movie_db)
         session.commit()
 
-    def update_movie_state(self, id, state):
+    def update_movie(self, id, values):
         session = get_session()
-        session.query(db_models.Movie).filter_by(id=id).update({'state': state})
+        movie_db_query = session.query(db_models.Movie).filter_by(id=id)
+        movie_db_query.update(values)
+        movie_db = movie_db_query.one()
         session.commit()
-
-    def update_movie_url(self, id, url):
-        session = get_session()
-        session.query(db_models.Movie).filter_by(id=id).update({'url': url})
-        session.commit()
+        return movie_db
 
     def delete_movie_by_id(self, id):
         session = get_session()
