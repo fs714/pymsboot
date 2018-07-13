@@ -4,8 +4,8 @@ from oslo_config import cfg
 from oslo_log import log as logging
 from oslo_service import service
 
-from pymsboot.movie.indirection.manager import IndirectionManager
-from pymsboot.movie.manager import MovieManager
+from pymsboot.engine.indirection.manager import IndirectionManager
+from pymsboot.engine.manager import EngineManager
 from pymsboot.rpc import rpc
 from pymsboot.services import periodics
 
@@ -35,7 +35,7 @@ class EngineService(service.Service):
         super(EngineService, self).start()
         transport = rpc.get_transport()
         target = messaging.Target(topic=self.topic, server=self.server)
-        endpoint = [MovieManager(), IndirectionManager()]
+        endpoint = [EngineManager(), IndirectionManager()]
         serializer = rpc.get_serializer()
         self.server = messaging.get_rpc_server(
             transport,

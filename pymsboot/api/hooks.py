@@ -1,7 +1,7 @@
 from pecan import hooks
 
 from pymsboot import context
-from pymsboot.movie import rpcapi
+from pymsboot.engine import rpcapi
 
 
 class ContextHook(hooks.PecanHook):
@@ -17,4 +17,4 @@ class RPCHook(hooks.PecanHook):
     """Attach the rpcapi object to the request so controllers can get to it."""
 
     def before(self, state):
-        state.request.rpcapi = rpcapi.get_movie_rpc_client()
+        state.request.rpcapi = rpcapi.get_engine_rpc_client()

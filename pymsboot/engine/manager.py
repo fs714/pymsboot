@@ -2,19 +2,19 @@ import oslo_messaging as messaging
 from oslo_log import log as logging
 
 from pymsboot import objects
-from pymsboot.movie.driver import MovieHandler
+from pymsboot.engine.driver import MovieHandler
 from pymsboot.rpc.manager import Manager
 
 LOG = logging.getLogger(__name__)
 
 
-class MovieManager(Manager):
-    RPC_API_NAMESPACE = 'movie'
+class EngineManager(Manager):
+    RPC_API_NAMESPACE = 'engine'
     RPC_API_VERSION = '1.0'
     target = messaging.Target(namespace=RPC_API_NAMESPACE, version=RPC_API_VERSION)
 
     def __init__(self):
-        super(MovieManager, self).__init__()
+        super(EngineManager, self).__init__()
         self.movie_handler = MovieHandler()
 
     def create_movie(self, ctx, movie_obj):

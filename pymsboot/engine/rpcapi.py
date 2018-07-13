@@ -10,18 +10,18 @@ LOG = logging.getLogger(__name__)
 _MOVIE_RPC_CLIENT = None
 
 
-def get_movie_rpc_client():
+def get_engine_rpc_client():
     global _MOVIE_RPC_CLIENT
     if _MOVIE_RPC_CLIENT is not None:
         return _MOVIE_RPC_CLIENT
 
-    _MOVIE_RPC_CLIENT = MovieClient()
+    _MOVIE_RPC_CLIENT = EngineClient()
     return _MOVIE_RPC_CLIENT
 
 
-class MovieClient(object):
+class EngineClient(object):
     def __init__(self):
-        self.namespace = 'movie'
+        self.namespace = 'engine'
         self.version = '1.0'
         target = messaging.Target(topic=CONF.engine.topic, namespace=self.namespace, version=self.version)
         serializer = rpc.get_serializer()

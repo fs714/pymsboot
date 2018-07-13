@@ -46,8 +46,8 @@ class PymsbootPersistentObject():
 class PymsbootObjectIndirectionAPI(ovoo_base.VersionedObjectIndirectionAPI):
     def __init__(self):
         super(PymsbootObjectIndirectionAPI, self).__init__()
-        from pymsboot.movie import rpcapi as engine_rpcapi
-        self._engineer = engine_rpcapi.get_movie_rpc_client()
+        from pymsboot.engine import rpcapi as engine_rpcapi
+        self._engineer = engine_rpcapi.get_engine_rpc_client()
 
     def object_action(self, context, objinst, objmethod, args, kwargs):
         return self._engineer.object_action(context, objinst, objmethod, args, kwargs)
