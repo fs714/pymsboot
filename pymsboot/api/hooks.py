@@ -17,4 +17,4 @@ class RPCHook(hooks.PecanHook):
     """Attach the rpcapi object to the request so controllers can get to it."""
 
     def before(self, state):
-        state.request.rpcapi = rpcapi.MovieClient()
+        state.request.rpcapi = rpcapi.get_movie_rpc_client()
