@@ -39,7 +39,7 @@ def db_setup():
 
     LOG.info('Init DB Data')
     for m in EXIST_MOVIES_DB:
-        get_connection().create_movie(m)
+        get_dbapi().create_movie(m)
 
 
 def get_engine():
@@ -70,7 +70,7 @@ def get_session():
     return session
 
 
-def get_connection():
+def get_dbapi():
     global _CONNECTION
     if _CONNECTION is not None:
         return _CONNECTION

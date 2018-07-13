@@ -19,7 +19,7 @@ class EngineService(service.Service):
         self.topic = CONF.engine.topic
         self.server = CONF.engine.host
 
-        self.workers = CONF.api.api_workers
+        self.workers = CONF.engine.engine_workers
         if self.workers is None or self.workers < 1:
             self.workers = processutils.get_worker_count()
 

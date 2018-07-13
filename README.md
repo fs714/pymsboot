@@ -26,14 +26,15 @@ This project use oslo_config to manage the project configuration.
     ```
     oslo-config-generator \
     --namespace pymsboot.config \
+    --namespace oslo.concurrency \
     --namespace oslo.config \
     --namespace oslo.log \
-    --namespace oslo.concurrency \
+    --namespace oslo.messaging \
     --namespace oslo.service.service \
     --namespace oslo.service.periodic_task \
     --namespace oslo.service.sslutils \
     --namespace oslo.service.wsgi \
-    --namespace oslo.messaging
+    --namespace oslo.versionedobjects
     ```
 2. Change Message Queue configration
     ```

@@ -1,5 +1,4 @@
 from oslo_config import cfg
-from oslo_log import log
 
 from pymsboot import version
 
@@ -116,27 +115,10 @@ def parse_args(args=None, usage=None, default_config_files=None):
     for group, options in list_opts():
         CONF.register_opts(list(options), group)
 
-    _DEFAULT_LOG_LEVELS = [
-        'eventlet.wsgi.server=WARN',
-        'oslo_service.periodic_task=INFO',
-        'oslo_service.loopingcall=INFO',
-        'oslo_db=WARN',
-        'oslo_concurrency.lockutils=WARN',
-        'keystoneclient=INFO',
-        'requests.packages.urllib3.connectionpool=CRITICAL',
-        'urllib3.connectionpool=CRITICAL',
-        'cotyledon=INFO',
-        'futurist.periodics=WARN'
-    ]
-    default_log_levels = log.get_default_log_levels()
-    default_log_levels.extend(_DEFAULT_LOG_LEVELS)
-    log.set_defaults(default_log_levels=default_log_levels)
-    log.register_options(CONF)
-
     CONF(
         args=args,
         project='pymsboot',
-        version=version,
+        version=version.version,
         usage=usage,
         default_config_files=default_config_files
     )

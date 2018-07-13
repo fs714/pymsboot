@@ -1,7 +1,7 @@
 from oslo_log import log as logging
 from oslo_versionedobjects import fields as object_fields
 
-from pymsboot.db.api import get_connection
+from pymsboot.db.api import get_dbapi
 from pymsboot.objects import base
 
 LOG = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ LOG = logging.getLogger(__name__)
 @base.PymsbootObjectRegistry.register
 class Movie(base.PymsbootObject, base.PymsbootPersistentObject, base.PymsbootObjectDictCompat):
     VERSION = '1.0'
-    dbapi = get_connection()
+    dbapi = get_dbapi()
 
     fields = {
         'id': object_fields.StringField(nullable=False),
