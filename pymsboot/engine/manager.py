@@ -2,7 +2,7 @@ import oslo_messaging as messaging
 from oslo_log import log as logging
 
 from pymsboot import objects
-from pymsboot.engine.driver import MovieHandler
+from pymsboot.driver.storage import MovieHandler
 from pymsboot.rpc.manager import Manager
 
 LOG = logging.getLogger(__name__)
