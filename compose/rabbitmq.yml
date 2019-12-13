@@ -1,0 +1,15 @@
+pymsboot-rabbitmq:
+  image: rabbitmq:3.7.6-management-alpine
+  restart: "always"
+  container_name: rabbitmq
+  hostname: rabbitmq
+  ports:
+    - 4369:4369
+    - 5671:5671
+    - 5672:5672
+    - 25672:25672
+    - 15671:15671
+    - 15672:15672
+  environment:
+    - RABBITMQ_DEFAULT_USER=guest
+    - RABBITMQ_DEFAULT_PASS=guest

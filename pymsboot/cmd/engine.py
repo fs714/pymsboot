@@ -9,8 +9,7 @@ from oslo_log import log as logging
 from oslo_service import service
 
 from pymsboot import config
-from pymsboot.db.api import db_setup
-from pymsboot.rpc import service as rpc_service
+from pymsboot.engine import service as rpc_service
 
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
@@ -35,7 +34,7 @@ def prepare_service(argv):
 
     logging.register_options(CONF)
     config.parse_args(args=argv)
-    logging.setup(CONF, 'pymsboot')
+    logging.setup(CONF, 'pymsboot_engine')
 
 
 def main():
@@ -46,8 +45,6 @@ def main():
             argv = sys.argv[1:]
         prepare_service(argv)
         LOG.info('Start Engine Server')
-
-        db_setup()
 
         engine_server = rpc_service.EngineService()
         launcher = service.launch(CONF, engine_server, workers=engine_server.workers)

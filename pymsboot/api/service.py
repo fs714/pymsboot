@@ -5,6 +5,7 @@ from oslo_service import service
 from oslo_service import wsgi
 
 from pymsboot.api import app
+from pymsboot.services import periodics
 
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
@@ -14,6 +15,13 @@ class WSGIService(service.ServiceBase):
     """Provides ability to launch API from wsgi app."""
 
     def __init__(self):
+        # Initial setup include databse, periodic tasks, etc
+        LOG.info('Starting periodic tasks...')
+        if CONF.api.enable_periodic_task_01:
+            periodics.start_periodic_task_01_handler()
+        if CONF.api.enable_periodic_task_02:
+            periodics.start_periodic_task_02_handler()
+
         self.app = app.setup_app()
 
         self.workers = CONF.api.api_workers

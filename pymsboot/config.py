@@ -5,9 +5,9 @@ from pymsboot import version
 CONF = cfg.CONF
 
 default_opts = [
-    cfg.StrOpt('db_engine', default='sqlite:////tmp/pymsboot.db', help='DB Engine'),
-    cfg.StrOpt('conf_test_01', default='conf_test_01_default', help='Pymsboot test 01 config.'),
-    cfg.StrOpt('conf_test_02', default='conf_test_02_default', help='Pymsboot test 02 config.'),
+    cfg.StrOpt('run_mode',
+               default='production',
+               help='Could be production or testing'),
 ]
 
 launch_opt = cfg.IntOpt(
@@ -23,7 +23,7 @@ api_opts = [
     cfg.IntOpt(
         'api_workers',
         default=0,
-        help='Number of workers for Pymsboot API service '
+        help='Number of workers for API service '
              'default 0 means number of CPUs available'
     ),
     cfg.BoolOpt(
@@ -36,31 +36,6 @@ api_opts = [
         default=False,
         help='Enable periodic task 02.'
     ),
-]
-
-PECAN_GROUP = 'pecan'
-pecan_opts = [
-    cfg.StrOpt(
-        'root',
-        default='pymsboot.api.controllers.root.RootController',
-        help='Pecan root controller'
-    ),
-    cfg.ListOpt(
-        'modules',
-        default=["pymsboot.api"],
-        help='A list of modules where pecan will search for applications.'
-    ),
-    cfg.BoolOpt(
-        'debug',
-        default=False,
-        help='Enables the ability to display tracebacks in the browser and'
-             ' interactively debug during development.'
-    ),
-    cfg.BoolOpt(
-        'auth_enable',
-        default=True,
-        help='Enables user authentication in pecan.'
-    )
 ]
 
 ENGINE_GROUP = 'engine'
@@ -80,7 +55,7 @@ engine_opts = [
     cfg.IntOpt(
         'engine_workers',
         default=0,
-        help='Number of workers for Pymsboot engine service '
+        help='Number of workers for engine service '
              'default 0 means number of CPUs available'
     ),
     cfg.BoolOpt(
@@ -99,7 +74,6 @@ engine_opts = [
 def list_opts():
     pymsboot_opts = [
         (API_GROUP, api_opts),
-        (PECAN_GROUP, pecan_opts),
         (ENGINE_GROUP, engine_opts),
         (None, [launch_opt]),
         (None, default_opts),

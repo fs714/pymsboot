@@ -1,0 +1,31 @@
+pymsboot-api:
+  image: pymsboot:latest
+  restart: "always"
+  container_name: pymsboot-api
+  hostname: pymsboot-api
+  extra_hosts:
+    - "aio-enet01-cnhk01.axesdn.com:100.64.0.1"
+    - "aio-enet01-cnsz01.axesdn.com:100.64.1.1"
+  ports:
+    - 9666:9666
+  volumes:
+    - /home/ubuntu/projects/pymsboot:/home/pymsboot
+    - /etc/pymsboot:/etc/pymsboot
+    - /var/log/pymsboot:/var/log/pymsboot
+    - /home/ubuntu/avr_backup:/home/avr_backup
+  command: ["python", "/home/pymsboot/start_api.py", "--config-file=/etc/pymsboot/pymsboot.conf", "--log-file=/var/log/pymsboot/pymsboot-api.log"]
+
+pymsboot-engine:
+  image: pymsboot:latest
+  restart: "always"
+  container_name: pymsboot-engine
+  hostname: pymsboot-engine
+  extra_hosts:
+    - "aio-enet01-cnhk01.axesdn.com:100.64.0.1"
+    - "aio-enet01-cnsz01.axesdn.com:100.64.1.1"
+  volumes:
+    - /home/ubuntu/projects/pymsboot:/home/pymsboot
+    - /etc/pymsboot:/etc/pymsboot
+    - /var/log/pymsboot:/var/log/pymsboot
+    - /home/ubuntu/avr_backup:/home/avr_backup
+  command: ["python", "/home/pymsboot/start_engine.py", "--config-file=/etc/pymsboot/pymsboot.conf", "--log-file=/var/log/pymsboot/pymsboot-engine.log"]

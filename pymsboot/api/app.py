@@ -1,48 +1,21 @@
-import pecan
+from flask import Flask
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from pymsboot.api import hooks
-from pymsboot.services import periodics
+from pymsboot.api.v1.movie import bp_movie
 
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
 
-def get_pecan_config():
-    # Set up the pecan configuration.
-    opts = CONF.pecan
+def setup_app():
+    app = Flask(__name__)
 
-    cfg_dict = {
-        "app": {
-            "root": opts.root,
-            "modules": opts.modules,
-            "debug": opts.debug,
-            "auth_enable": opts.auth_enable
-        }
-    }
-
-    return pecan.configuration.conf_from_dict(cfg_dict)
-
-
-def setup_app(config=None):
-    if not config:
-        config = get_pecan_config()
-    app_conf = dict(config.app)
-
-    # Initial setup include databse, periodic tasks, etc
-    LOG.info('Starting periodic tasks...')
-    if CONF.api.enable_periodic_task_01:
-        periodics.start_periodic_task_01_handler()
-
-    if CONF.api.enable_periodic_task_02:
-        periodics.start_periodic_task_02_handler()
-
-    app = pecan.make_app(
-        app_conf.pop('root'),
-        hooks=[hooks.ContextHook(), hooks.RPCHook()],
-        logging=getattr(config, 'logging', {}),
-        **app_conf
+    app.config.update(
+        DEBUG=True,
+        SECRET_KEY=b'\x87T4a\x00\x8e\x12\xf8\xaa\x90\xe2\x98\xcf6Td\xaa\xf6\x8e\xf2\n\xae\x12'
     )
+
+    app.register_blueprint(bp_movie, url_prefix='/api/v1/')
 
     return app

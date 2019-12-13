@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, String
+from oslo_db.sqlalchemy import models
 from sqlalchemy.ext.declarative import declarative_base
 
 
-class PymsbootBase():
+class PymsbootBase(models.ModelBase):
+    metadata = None
 
     def as_dict(self):
         d = {}
@@ -10,15 +11,13 @@ class PymsbootBase():
             d[c.name] = self[c.name]
         return d
 
+    def save(self, session=None):
+        import pymsboot.db.api as db_api
+
+        if session is None:
+            session = db_api.get_session()
+
+        super(PymsbootBase, self).save(session)
+
 
 Base = declarative_base(cls=PymsbootBase)
-
-
-class Movie(Base):
-    __tablename__ = 'movie'
-
-    id = Column(String(255), primary_key=True, unique=True)
-    name = Column(String(64), nullable=False, unique=True)
-    rank = Column(Integer)
-    url = Column(String(255))
-    state = Column(String(64))

@@ -7,16 +7,16 @@ from pymsboot.rpc import rpc
 CONF = cfg.CONF
 LOG = logging.getLogger(__name__)
 
-_MOVIE_RPC_CLIENT = None
+_ENGINE_RPC_CLIENT = None
 
 
 def get_engine_rpc_client():
-    global _MOVIE_RPC_CLIENT
-    if _MOVIE_RPC_CLIENT is not None:
-        return _MOVIE_RPC_CLIENT
+    global _ENGINE_RPC_CLIENT
+    if _ENGINE_RPC_CLIENT is not None:
+        return _ENGINE_RPC_CLIENT
 
-    _MOVIE_RPC_CLIENT = EngineClient()
-    return _MOVIE_RPC_CLIENT
+    _ENGINE_RPC_CLIENT = EngineClient()
+    return _ENGINE_RPC_CLIENT
 
 
 class EngineClient(object):
@@ -24,8 +24,7 @@ class EngineClient(object):
         self.namespace = 'engine'
         self.version = '1.0'
         target = messaging.Target(topic=CONF.engine.topic, namespace=self.namespace, version=self.version)
-        serializer = rpc.get_serializer()
-        self._client = messaging.RPCClient(rpc.get_transport(), target, serializer=serializer)
+        self._client = messaging.RPCClient(rpc.get_transport(), target)
 
     def create_movie(self, context, movie_obj):
         cctxt = self._client.prepare(version=self.version, fanout=False)
@@ -38,17 +37,3 @@ class EngineClient(object):
     def delete_movie(self, context, movie_id):
         cctxt = self._client.prepare(version=self.version, fanout=False)
         cctxt.cast(context, 'delete_movie', movie_id=movie_id)
-
-    # Versioned Objects indirection API
-    def object_class_action(self, context, objname, objmethod, objver, args, kwargs):
-        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
-        return cctxt.call(context, 'object_class_action', objname=objname, objmethod=objmethod,
-                          objver=objver, args=args, kwargs=kwargs)
-
-    def object_action(self, context, objinst, objmethod, args, kwargs):
-        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
-        return cctxt.call(context, 'object_action', objinst=objinst, objmethod=objmethod, args=args, kwargs=kwargs)
-
-    def object_backport(self, context, objinst, target_version):
-        cctxt = self._client.prepare(version=self.version, namespace='indirection', fanout=False)
-        return cctxt.call(context, 'object_backport', objinst=objinst, target_version=target_version)
