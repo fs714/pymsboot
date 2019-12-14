@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  db:
+    image: postgres:12.1-alpine
+    restart: always
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: pymsboot
+      POSTGRES_PASSWORD: pymsboot
+  adminer:
+    image: adminer
+    restart: always
+    container_name: adminer
+    hostname: adminer
+    ports:
+      - 8080:8080
