@@ -16,6 +16,13 @@ class EngineManager(Manager):
         super(EngineManager, self).__init__()
         self.movie_handler = MovieHandler()
 
+    def get_movie(self, ctx, **kwargs):
+        LOG.info('Get movie {}'.format(kwargs.get("uuid")))
+
+    def get_all_movie(self, ctx, **kwargs):
+        LOG.info('Get all movie')
+        return {'key': 'value'}
+
     def create_movie(self, ctx, movie_obj):
         LOG.info('Add movie {}'.format(movie_obj.id))
         # movie_obj.state = 'Downloading'

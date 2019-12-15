@@ -24,16 +24,25 @@ class EngineClient(object):
         self.namespace = 'engine'
         self.version = '1.0'
         target = messaging.Target(topic=CONF.engine.topic, namespace=self.namespace, version=self.version)
-        self._client = messaging.RPCClient(rpc.get_transport(), target)
+        self._client = messaging.RPCClient(rpc.get_transport(), target, serializer=rpc.get_serializer())
 
-    def create_movie(self, context, movie_obj):
+    def get_movie(self, context, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'create_movie', movie_obj=movie_obj)
+        LOG.info(context)
+        cctxt.call(context, 'get_movie', kwargs)
 
-    def update_movie(self, context, movie_obj):
+    def get_all_movie(self, context, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'update_movie', movie_obj=movie_obj)
+        return cctxt.call(context, 'get_all_movie', **kwargs)
 
-    def delete_movie(self, context, movie_id):
+    def create_movie(self, context, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'delete_movie', movie_id=movie_id)
+        cctxt.cast(context, 'create_movie', kwargs)
+
+    def update_movie(self, context, **kwargs):
+        cctxt = self._client.prepare(version=self.version, fanout=False)
+        cctxt.cast(context, 'update_movie', kwargs)
+
+    def delete_movie(self, context, movie_uuid):
+        cctxt = self._client.prepare(version=self.version, fanout=False)
+        cctxt.cast(context, 'delete_movie', movie_uuid=movie_uuid)

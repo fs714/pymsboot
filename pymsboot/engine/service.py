@@ -16,7 +16,7 @@ class EngineService(service.Service):
     def __init__(self):
         super(EngineService, self).__init__()
         self.topic = CONF.engine.topic
-        self.server = CONF.engine.host
+        self.server_name = CONF.engine.host
 
         self.workers = CONF.engine.engine_workers
         if self.workers is None or self.workers < 1:
@@ -32,12 +32,13 @@ class EngineService(service.Service):
     def start(self):
         super(EngineService, self).start()
         transport = rpc.get_transport()
-        target = messaging.Target(topic=self.topic, server=self.server)
+        target = messaging.Target(topic=self.topic, server=self.server_name)
         endpoint = [EngineManager()]
         self.server = messaging.get_rpc_server(
             transport,
             target,
             endpoint,
+            serializer=rpc.get_serializer(),
             executor='eventlet'
         )
 
