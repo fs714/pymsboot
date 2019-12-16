@@ -1,9 +1,12 @@
+import sys
+sys.path.append('../')
+
 from sqlalchemy import create_engine, inspect
+
 from pymsboot.db import models
 from pymsboot.db.tables.movie import *
 
-# CONN_STR = 'postgres://knight:8pPvp3HjoB3ePpKOBAdBssSUCUAuMPd8sSr6J3tRD14=@axesdn-db-dev.crtxlghyjpby.rds.cn-north-1.amazonaws.com.cn:5432/aosdb_dev'
-CONN_STR = 'postgres://user:addr:5432/dbname'
+CONN_STR = 'postgres://pymsboot:pymsboot@127.0.0.1:5432/pymsboot'
 
 
 def main():

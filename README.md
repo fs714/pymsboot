@@ -57,7 +57,7 @@ This project use oslo_config to manage the project configuration.
   api_workers = 2
 
   [database]
-  connection = postgresql+psycopg2://user:addr:5432/db_name
+  connection = postgresql+psycopg2://user:pass@addr:port/db_name
 
   [engine]
   #host = 0.0.0.0
