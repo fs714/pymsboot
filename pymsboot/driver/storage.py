@@ -9,12 +9,12 @@ class MovieHandler():
     def __init__(self):
         pass
 
-    def download(self, movie_id, url):
-        LOG.info('Start download movie {} from {}'.format(movie_id, url))
-        time.sleep(15)
-        LOG.info('Finished download movie {} from {}'.format(movie_id, url))
-
-    def remove(self, movie_id):
-        LOG.info('Delete movie {}'.format(movie_id))
+    def download(self, uuid, url):
+        LOG.info('Start download movie {} from {}'.format(uuid, url))
         time.sleep(5)
-        LOG.info('Finished to delete movie {}'.format(movie_id))
+        LOG.info('Finished download movie {} from {}'.format(uuid, url))
+
+    def remove(self, uuid):
+        LOG.info('Delete movie {}'.format(uuid))
+        time.sleep(2)
+        LOG.info('Finished to delete movie {}'.format(uuid))

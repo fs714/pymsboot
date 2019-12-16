@@ -1,16 +1,16 @@
 import datetime
-import uuid
 
+from oslo_utils import uuidutils
 from sqlalchemy import Integer, String, Column, DateTime, JSON
 
-from pymsboot.db.models import Base
+from pymsboot.db.models import PymsbootBase
 
 
-class Movie(Base):
+class Movie(PymsbootBase):
     __tablename__ = 'movie'
 
     id = Column(Integer, primary_key=True, unique=True)
-    uuid = Column(String(64), default=str(uuid.uuid1()))
+    uuid = Column(String(64), default=str(uuidutils.generate_uuid()))
     name = Column(String(64), nullable=False, unique=True)
     rank = Column(Integer)
     url = Column(String(255))

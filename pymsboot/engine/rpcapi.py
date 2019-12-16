@@ -26,10 +26,9 @@ class EngineClient(object):
         target = messaging.Target(topic=CONF.engine.topic, namespace=self.namespace, version=self.version)
         self._client = messaging.RPCClient(rpc.get_transport(), target, serializer=rpc.get_serializer())
 
-    def get_movie(self, context, **kwargs):
+    def get_movie(self, context, uuid):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        LOG.info(context)
-        cctxt.call(context, 'get_movie', kwargs)
+        return cctxt.call(context, 'get_movie', uuid=uuid)
 
     def get_all_movie(self, context, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
@@ -37,11 +36,11 @@ class EngineClient(object):
 
     def create_movie(self, context, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'create_movie', kwargs)
+        cctxt.cast(context, 'create_movie', **kwargs)
 
-    def update_movie(self, context, **kwargs):
+    def update_movie(self, context, uuid, **kwargs):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'update_movie', kwargs)
+        cctxt.cast(context, 'update_movie', uuid=uuid, **kwargs)
 
     def delete_movie(self, context, movie_uuid):
         cctxt = self._client.prepare(version=self.version, fanout=False)

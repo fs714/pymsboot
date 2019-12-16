@@ -20,12 +20,8 @@ def prepare_service(argv):
         'eventlet.wsgi.server=WARN',
         'oslo_service.periodic_task=INFO',
         'oslo_service.loopingcall=INFO',
-        'oslo_db=WARN',
         'oslo_concurrency.lockutils=WARN',
-        'keystoneclient=INFO',
-        'requests.packages.urllib3.connectionpool=CRITICAL',
         'urllib3.connectionpool=CRITICAL',
-        'cotyledon=INFO',
         'futurist.periodics=WARN'
     ]
     default_log_levels = logging.get_default_log_levels()

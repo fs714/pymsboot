@@ -8,6 +8,9 @@ default_opts = [
     cfg.StrOpt('run_mode',
                default='production',
                help='Could be production or testing'),
+    cfg.StrOpt('db_connection',
+               default='postgresql+psycopg2://pymsboot:pymsboot@127.0.0.1:5432/pymsboot',
+               help='Database connection url')
 ]
 
 launch_opt = cfg.IntOpt(

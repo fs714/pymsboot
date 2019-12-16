@@ -1,6 +1,7 @@
 import oslo_messaging as messaging
 from oslo_log import log as logging
 
+from pymsboot.db import api as db_api
 from pymsboot.driver.storage import MovieHandler
 from pymsboot.rpc.manager import Manager
 
@@ -14,34 +15,39 @@ class EngineManager(Manager):
 
     def __init__(self):
         super(EngineManager, self).__init__()
-        self.movie_handler = MovieHandler()
+        self.db_api = db_api.DbApi()
 
-    def get_movie(self, ctx, **kwargs):
-        LOG.info('Get movie {}'.format(kwargs.get("uuid")))
+    def get_movie(self, ctx, uuid):
+        LOG.info('Get movie {}'.format(uuid))
+        movie_db = self.db_api.get_movie_by_uuid(uuid)
+        return movie_db.as_dict()
 
     def get_all_movie(self, ctx, **kwargs):
         LOG.info('Get all movie')
-        return {'key': 'value'}
+        movies_db = self.db_api.get_all_movies()
+        return [m.as_dict() for m in movies_db]
 
-    def create_movie(self, ctx, movie_obj):
-        LOG.info('Add movie {}'.format(movie_obj.id))
-        # movie_obj.state = 'Downloading'
-        # movie_obj.create(ctx)
-        # self.movie_handler.download(movie_obj.id, movie_obj.url)
-        # movie_obj.state = 'Downloaded'
-        # movie_obj.update(ctx)
+    def create_movie(self, ctx, **kwargs):
+        movie_dict = kwargs['content_json']
 
-    def update_movie(self, ctx, movie_obj):
-        LOG.info('Update movie {}'.format(movie_obj.id))
-        # movie_obj.state = 'Downloading'
-        # movie_obj.update(ctx)
-        # self.movie_handler.remove(movie_obj.id)
-        # self.movie_handler.download(movie_obj.id, movie_obj.url)
-        # movie_obj.state = 'Downloaded'
-        # movie_obj.update(ctx)
+        LOG.info('Add movie {}'.format(movie_dict))
+        movie_dict['state'] = 'downloading'
+        self.db_api.create_movie(movie_dict)
 
-    def delete_movie(self, ctx, movie_id):
-        LOG.info('Delete movie {}'.format(movie_id))
-        # movie_obj = objects.Movie.get_by_id(ctx, movie_id)
-        # self.movie_handler.remove(movie_id)
-        # movie_obj.delete(ctx, movie_id)
+        movie_handler = MovieHandler()
+        movie_handler.download(movie_dict['uuid'], movie_dict['url'])
+        movie_dict['state'] = 'ready'
+        self.db_api.create_movie(movie_dict)
+
+    def update_movie(self, ctx, uuid, **kwargs):
+        movie_dict = kwargs['content_json']
+
+        LOG.info('Update movie {}'.format(movie_dict))
+        self.db_api.update_movie(uuid, movie_dict)
+
+    def delete_movie(self, ctx, uuid):
+        LOG.info('Delete movie {}'.format(uuid))
+
+        movie_handler = MovieHandler()
+        movie_handler.remove(uuid)
+        self.db_api.delete_movie_by_uuid(uuid)
