@@ -3,10 +3,10 @@ import datetime
 from oslo_utils import uuidutils
 from sqlalchemy import Integer, String, Column, DateTime, JSON
 
-from pymsboot.db.models import PymsbootBase
+from pymsboot.db.models import Base
 
 
-class Movie(PymsbootBase):
+class Movie(Base):
     __tablename__ = 'movie'
 
     id = Column(Integer, primary_key=True, unique=True)

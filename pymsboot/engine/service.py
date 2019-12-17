@@ -48,7 +48,10 @@ class EngineService(service.Service):
     def stop(self, graceful=False):
         periodics.stop()
 
-        if self.server:
-            self.server.stop()
-            self.server.wait()
+        try:
+            if self.server:
+                self.server.stop()
+                self.server.wait()
+        except Exception:
+            pass
         super(EngineService, self).stop(graceful)

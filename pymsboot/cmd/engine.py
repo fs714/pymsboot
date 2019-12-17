@@ -10,6 +10,7 @@ from oslo_service import service
 
 from pymsboot import config
 from pymsboot.engine import service as rpc_service
+from pymsboot.db.api import db_init
 
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
@@ -42,6 +43,7 @@ def main():
         prepare_service(argv)
         LOG.info('Start Engine Server')
 
+        db_init()
         engine_server = rpc_service.EngineService()
         launcher = service.launch(CONF, engine_server, workers=engine_server.workers)
         launcher.wait()

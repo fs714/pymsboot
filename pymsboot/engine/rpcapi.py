@@ -42,6 +42,6 @@ class EngineClient(object):
         cctxt = self._client.prepare(version=self.version, fanout=False)
         cctxt.cast(context, 'update_movie', uuid=uuid, **kwargs)
 
-    def delete_movie(self, context, movie_uuid):
+    def delete_movie(self, context, uuid):
         cctxt = self._client.prepare(version=self.version, fanout=False)
-        cctxt.cast(context, 'delete_movie', movie_uuid=movie_uuid)
+        cctxt.cast(context, 'delete_movie', uuid=uuid)

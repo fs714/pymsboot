@@ -15,6 +15,6 @@ class MovieHandler():
         LOG.info('Finished download movie {} from {}'.format(uuid, url))
 
     def remove(self, uuid):
-        LOG.info('Delete movie {}'.format(uuid))
+        LOG.info('Start delete movie {}'.format(uuid))
         time.sleep(2)
         LOG.info('Finished to delete movie {}'.format(uuid))

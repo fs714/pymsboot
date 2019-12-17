@@ -36,8 +36,7 @@ class EngineManager(Manager):
 
         movie_handler = MovieHandler()
         movie_handler.download(movie_dict['uuid'], movie_dict['url'])
-        movie_dict['state'] = 'ready'
-        self.db_api.create_movie(movie_dict)
+        self.db_api.update_movie(movie_dict['uuid'], {'state': 'ready'})
 
     def update_movie(self, ctx, uuid, **kwargs):
         movie_dict = kwargs['content_json']

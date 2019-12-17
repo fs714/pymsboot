@@ -22,7 +22,9 @@ def prepare_service(argv):
         'oslo_service.loopingcall=INFO',
         'oslo_concurrency.lockutils=WARN',
         'urllib3.connectionpool=CRITICAL',
-        'futurist.periodics=WARN'
+        'futurist.periodics=WARN',
+        'flask=INFO',
+        'werkzeug=INFO'
     ]
     default_log_levels = logging.get_default_log_levels()
     default_log_levels.extend(_DEFAULT_LOG_LEVELS)

@@ -52,12 +52,12 @@ def start_periodic_task_02_handler():
 def stop(task=None):
     if not task:
         for name, worker in _periodic_tasks.items():
-            LOG.info('Stopping periodic task: %s', name)
+            LOG.info('Stopping periodic task {}'.format())
             worker.stop()
             del _periodic_tasks[name]
     else:
         worker = _periodic_tasks.get(task)
         if worker:
-            LOG.info('Stopping periodic task: %s', task)
+            LOG.info('Stopping periodic task {}'.format(task))
             worker.stop()
             del _periodic_tasks[task]

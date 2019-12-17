@@ -8,9 +8,12 @@ from pymsboot.db.tables.movie import *
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
-engine = create_engine(CONF.db_connection)
-session_factory = sessionmaker(bind=engine)
-Session = scoped_session(session_factory)
+
+def db_init():
+    engine = create_engine(CONF.db_connection)
+    session_factory = sessionmaker(bind=engine)
+    global Session
+    Session = scoped_session(session_factory)
 
 
 class DbApi(object):
@@ -33,10 +36,9 @@ class DbApi(object):
 
     def create_movie(self, movie_dict):
         movie_db = Movie(**movie_dict)
-        LOG.info(movie_db)
         self.session.add(movie_db)
         self.session.commit()
-        movie_db = self.session.query(Movie).filter_by(uuid=uuid).one()
+        movie_db = self.session.query(Movie).filter_by(uuid=movie_dict['uuid']).one()
         return movie_db
 
     def update_movie(self, uuid, values):
