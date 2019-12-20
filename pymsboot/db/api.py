@@ -10,6 +10,7 @@ CONF = cfg.CONF
 
 
 def db_init():
+    LOG.info('Initialize DB from {}'.format(CONF.db_connection))
     engine = create_engine(CONF.db_connection)
     session_factory = sessionmaker(bind=engine)
     global Session
@@ -38,15 +39,11 @@ class DbApi(object):
         movie_db = Movie(**movie_dict)
         self.session.add(movie_db)
         self.session.commit()
-        movie_db = self.session.query(Movie).filter_by(uuid=movie_dict['uuid']).one()
-        return movie_db
 
     def update_movie(self, uuid, values):
         movie_db_query = self.session.query(Movie).filter_by(uuid=uuid)
         movie_db_query.update(values)
         self.session.commit()
-        movie_db = movie_db_query.one()
-        return movie_db
 
     def delete_movie_by_uuid(self, uuid):
         self.session.query(Movie).filter_by(uuid=uuid).delete()

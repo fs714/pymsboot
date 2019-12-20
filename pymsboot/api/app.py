@@ -1,9 +1,15 @@
+import sys
+from datetime import datetime
+
 from flask import Flask, g
+from flask.json import JSONEncoder
 from oslo_config import cfg
 from oslo_log import log as logging
 
+from pymsboot import config
 from pymsboot.api.v1.movie import bp_movie
 from pymsboot.context import make_context
+from pymsboot.db.api import db_init, DbApi
 
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
@@ -11,13 +17,47 @@ CONF = cfg.CONF
 app = Flask(__name__)
 
 
-def setup_app():
+def prepare_service(argv):
+    _DEFAULT_LOG_LEVELS = [
+        'eventlet.wsgi.server=WARN',
+        'oslo_service.periodic_task=INFO',
+        'oslo_service.loopingcall=INFO',
+        'oslo_concurrency.lockutils=WARN',
+        'urllib3.connectionpool=CRITICAL',
+        'futurist.periodics=WARN',
+        'flask=INFO',
+        'sqlalchemy=WARN',
+        'werkzeug=INFO'
+    ]
+    extra_log_level_defaults = [
+        'flask=INFO'
+    ]
+    default_log_levels = logging.get_default_log_levels()
+    default_log_levels.extend(_DEFAULT_LOG_LEVELS)
+    logging.register_options(CONF)
+    logging.set_defaults(default_log_levels=default_log_levels + extra_log_level_defaults)
+
+    config.parse_args(args=argv)
+
+    logging.setup(CONF, 'pymsboot_api')
+
+
+def create_app():
+    if sys.argv is None:
+        argv = []
+    else:
+        argv = sys.argv[1:]
+    prepare_service(argv)
+
+    db_init()
+
     LOG.info('setup api wsgi app')
     app.config.update(
         DEBUG=True,
         SECRET_KEY=b'\x87T4a\x00\x8e\x12\xf8\xaa\x90\xe2\x98\xcf6Td\xaa\xf6\x8e\xf2\n\xae\x12'
     )
 
+    app.json_encoder = CustomJSONEncoder
     app.wsgi_app = OsloLogMiddleware(app.wsgi_app)
 
     app.register_blueprint(bp_movie, url_prefix='/api/v1/')
@@ -27,7 +67,22 @@ def setup_app():
 
 @app.before_request
 def before_req():
+    g.dbapi = DbApi()
     g.req_ctx = make_context()
+
+
+class CustomJSONEncoder(JSONEncoder):
+
+    def default(self, obj):
+        try:
+            if isinstance(obj, datetime):
+                return obj.isoformat()
+            iterable = iter(obj)
+        except TypeError:
+            pass
+        else:
+            return list(iterable)
+        return JSONEncoder.default(self, obj)
 
 
 class OsloLogMiddleware(object):
@@ -39,9 +94,9 @@ class OsloLogMiddleware(object):
         self.application = application
 
     def __call__(self, environ, start_response):
-        LOG.debug('Starting request: %s "%s %s"' %
-                  (environ['REMOTE_ADDR'], environ['REQUEST_METHOD'],
-                   self._get_uri(environ)))
+        LOG.info('Starting request: %s "%s %s"' %
+                 (environ['REMOTE_ADDR'], environ['REQUEST_METHOD'],
+                  self._get_uri(environ)))
 
         if LOG.isEnabledFor(logging.INFO):
             return self._log_app(environ, start_response)
